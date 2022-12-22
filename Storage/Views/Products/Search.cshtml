@@ -1,0 +1,20 @@
+﻿@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<form asp-action="Search" asp-controller="Products" method="get">
+    <input class ="form-control" type="text" asp-for="Name" placeholder="Name" />
+    <select class="form-control" asp-for="Category" asp-items="@Model.Categories">
+        <option selected="selected" value="">Select Category</option>
+    </select>
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search">Search</i></button>
+</form>
+
+<partial name="_ProductsTable" model="@Model.Products" />

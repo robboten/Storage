@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Storage.Data;
 
@@ -11,9 +12,11 @@ using Storage.Data;
 namespace Storage.Migrations
 {
     [DbContext(typeof(StorageContext))]
-    partial class StorageContextModelSnapshot : ModelSnapshot
+    [Migration("20221222123918_catdb2")]
+    partial class catdb2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,9 +53,6 @@ namespace Storage.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
@@ -76,8 +76,6 @@ namespace Storage.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("ProductViewModelId");
 
@@ -103,17 +101,9 @@ namespace Storage.Migrations
 
             modelBuilder.Entity("Storage.Models.Product", b =>
                 {
-                    b.HasOne("Storage.Models.CategoryDb", "CategoryDb")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Storage.Models.ProductViewModel", null)
                         .WithMany("Products")
                         .HasForeignKey("ProductViewModelId");
-
-                    b.Navigation("CategoryDb");
                 });
 
             modelBuilder.Entity("Storage.Models.ProductViewModel", b =>

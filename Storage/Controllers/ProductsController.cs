@@ -14,58 +14,40 @@ namespace Storage.Controllers
         {
             _context = context;
         }
-
-        public async Task<IActionResult> DropDown(ProductViewModel view)
+        
+        public async Task<IActionResult> Search(ProductViewModel view)
         {
-            var products = await _context.Product.Where(p=>p.Category==view.Category).ToListAsync();
-            //var cats = products.Select(p => p.Category).Distinct().ToList();
-            var cats = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
+            var products = string.IsNullOrWhiteSpace(view.Name) ? _context.Product : 
+                _context.Product.Where(p=>p.Name.Contains(view.Name));
+            products = view.Category is null ? products : products.Where(p => p.Category == view.Category);
+
+            //get all categories, not just those in filtered view
+            var categories = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
 
             ProductViewModel newView = new()
             {
                 Products= products,
-                Categories = cats.Select(c=>new SelectListItem { Text=c.ToString() }).ToList(),
+                Categories = categories.Select(c=>new SelectListItem { Text=c.ToString() }).ToList(),
             };
             return View(newView);
         }
 
-        public async Task<IActionResult> Filter(string filterStr)
+        public async Task<IActionResult> Storage()
         {
-
-            var productList = string.IsNullOrWhiteSpace(filterStr) ? await _context.Product.ToListAsync() : await _context.Product.Where(p => p.Name.Contains(filterStr)).ToListAsync();
-
             var categories = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
 
-            var newView = await _context.Product.Select(e => new ProductViewModel
+            var newView = await _context.Product.Select(p => new ProductViewModelAlt
             {
-                Name = e.Name,
-                Price = e.Price,
-                Count = e.Count,
-                InventoryValue = e.Count * e.Price,
-                Categories = categories.Select(c => new SelectListItem { Text = c.ToString() }).ToList(),
-                Products = productList,
+                Name = p.Name,
+                Price = p.Price,
+                Count = p.Count,
+                InventoryValue = p.Count * p.Price,
+                Category = p.Category,
+                CategoryId = p.CategoryId
             }).ToListAsync();
 
-            return View("Filter", newView);
-        }
-
-        public async Task<IActionResult> Storage(ProductViewModel view)
-        {
-
-            var products = view==null ? await _context.Product.ToListAsync() : await _context.Product.Where(p => p.Category == view.Category).ToListAsync();
-            //var cats = products.Select(p => p.Category).Distinct().ToList();
-            var cats = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
-
-            IEnumerable<ProductViewModel> productViewModels = null;
-
-            ProductViewModel newView = new()
-            {
-                Products = products,
-                Categories = cats.Select(c => new SelectListItem { Text = c.ToString() }).ToList(),
-            };
             return View(newView);
         }
-
 
         // GET: Products
         public async Task<IActionResult> Index()
