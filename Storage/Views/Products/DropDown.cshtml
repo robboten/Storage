@@ -1,0 +1,36 @@
+﻿@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<form asp-action="DropDown" asp-controller="Products" method="get">
+    <input class ="form-control" type="text" asp-for="Name" placeholder="Name" />
+    <select class="form-control" asp-for="Category" asp-items="@Model.Categories"></select>
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search">Search</i></button>
+</form>
+<p>@Model.Name</p>
+<table class="table">
+    <tbody>
+        @foreach (var item in Model.Products)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

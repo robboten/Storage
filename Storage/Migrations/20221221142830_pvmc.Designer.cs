@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Storage.Data;
 
@@ -11,9 +12,11 @@ using Storage.Data;
 namespace Storage.Migrations
 {
     [DbContext(typeof(StorageContext))]
-    partial class StorageContextModelSnapshot : ModelSnapshot
+    [Migration("20221221142830_pvmc")]
+    partial class pvmc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,15 +52,10 @@ namespace Storage.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductViewModelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Shelf")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductViewModelId");
 
                     b.ToTable("Product");
                 });
@@ -86,18 +84,6 @@ namespace Storage.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProductViewModel");
-                });
-
-            modelBuilder.Entity("Storage.Models.Product", b =>
-                {
-                    b.HasOne("Storage.Models.ProductViewModel", null)
-                        .WithMany("Products")
-                        .HasForeignKey("ProductViewModelId");
-                });
-
-            modelBuilder.Entity("Storage.Models.ProductViewModel", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

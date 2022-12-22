@@ -6,27 +6,13 @@ using Storage.Models;
 
 namespace Storage.Controllers
 {
-    public class ProductsController : Controller
+    public class ProductViewModelsController : Controller
     {
         private readonly StorageContext _context;
 
-        public ProductsController(StorageContext context)
+        public ProductViewModelsController(StorageContext context)
         {
             _context = context;
-        }
-
-        public async Task<IActionResult> DropDown(ProductViewModel view)
-        {
-            var products = await _context.Product.Where(p=>p.Category==view.Category).ToListAsync();
-            //var cats = products.Select(p => p.Category).Distinct().ToList();
-            var cats = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
-
-            ProductViewModel newView = new()
-            {
-                Products= products,
-                Categories = cats.Select(c=>new SelectListItem { Text=c.ToString() }).ToList(),
-            };
-            return View(newView);
         }
 
         public async Task<IActionResult> Filter(string filterStr)
@@ -49,97 +35,78 @@ namespace Storage.Controllers
             return View("Filter", newView);
         }
 
-        public async Task<IActionResult> Storage(ProductViewModel view)
-        {
-
-            var products = view==null ? await _context.Product.ToListAsync() : await _context.Product.Where(p => p.Category == view.Category).ToListAsync();
-            //var cats = products.Select(p => p.Category).Distinct().ToList();
-            var cats = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
-
-            IEnumerable<ProductViewModel> productViewModels = null;
-
-            ProductViewModel newView = new()
-            {
-                Products = products,
-                Categories = cats.Select(c => new SelectListItem { Text = c.ToString() }).ToList(),
-            };
-            return View(newView);
-        }
-
-
-        // GET: Products
+        // GET: ProductViewModels
         public async Task<IActionResult> Index()
         {
-            return _context.Product != null ?
-                        View(await _context.Product.ToListAsync()) :
-                        Problem("Entity set 'StorageContext.Product'  is null.");
+            return _context.ProductViewModel != null ?
+                        View(await _context.ProductViewModel.ToListAsync()) :
+                        Problem("Entity set 'StorageContext.ProductViewModel'  is null.");
         }
 
-
-        // GET: Products/Details/5
+        // GET: ProductViewModels/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Product == null)
+            if (id == null || _context.ProductViewModel == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Product
+            var productViewModel = await _context.ProductViewModel
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
+            if (productViewModel == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(productViewModel);
         }
 
-        // GET: Products/Create
+        // GET: ProductViewModels/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Products/Create
+        // POST: ProductViewModels/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,OrderDate,Category,Shelf,Count,Description")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Name,Price,Count,InventoryValue")] ProductViewModel productViewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.Add(productViewModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(productViewModel);
         }
 
-        // GET: Products/Edit/5
+        // GET: ProductViewModels/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Product == null)
+            if (id == null || _context.ProductViewModel == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
-            if (product == null)
+            var productViewModel = await _context.ProductViewModel.FindAsync(id);
+            if (productViewModel == null)
             {
                 return NotFound();
             }
-            return View(product);
+            return View(productViewModel);
         }
 
-        // POST: Products/Edit/5
+        // POST: ProductViewModels/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,OrderDate,Category,Shelf,Count,Description")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Count,InventoryValue")] ProductViewModel productViewModel)
         {
-            if (id != product.Id)
+            if (id != productViewModel.Id)
             {
                 return NotFound();
             }
@@ -148,12 +115,12 @@ namespace Storage.Controllers
             {
                 try
                 {
-                    _context.Update(product);
+                    _context.Update(productViewModel);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.Id))
+                    if (!ProductViewModelExists(productViewModel.Id))
                     {
                         return NotFound();
                     }
@@ -164,49 +131,49 @@ namespace Storage.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(productViewModel);
         }
 
-        // GET: Products/Delete/5
+        // GET: ProductViewModels/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Product == null)
+            if (id == null || _context.ProductViewModel == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Product
+            var productViewModel = await _context.ProductViewModel
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
+            if (productViewModel == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(productViewModel);
         }
 
-        // POST: Products/Delete/5
+        // POST: ProductViewModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Product == null)
+            if (_context.ProductViewModel == null)
             {
-                return Problem("Entity set 'StorageContext.Product'  is null.");
+                return Problem("Entity set 'StorageContext.ProductViewModel'  is null.");
             }
-            var product = await _context.Product.FindAsync(id);
-            if (product != null)
+            var productViewModel = await _context.ProductViewModel.FindAsync(id);
+            if (productViewModel != null)
             {
-                _context.Product.Remove(product);
+                _context.ProductViewModel.Remove(productViewModel);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
+        private bool ProductViewModelExists(int id)
         {
-            return (_context.Product?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.ProductViewModel?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

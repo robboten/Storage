@@ -1,20 +1,21 @@
 ﻿@model ProductViewModel
+
 @{
-    ViewData["Title"] = "ProductsView";
+    ViewData["Title"] = "Filter";
 }
 
-<h1>ProductsView</h1>
+<h1>Index</h1>
 
 <p>
-    <a asp-action="ProductsView">Create New</a>
+    <a asp-action="Create">Filter</a>
 </p>
-<form asp-action="ProductsFilter">
-    <input type="text" name="searchString" asp-for="Name" placeholder="Filter by Category" />
-    <button type="submit" class="btn btn-primary mb-2">Search</button>
-    <select class="form-control" asp-for="Categories" asp-items="@Html.GetEnumSelectList<Category>()">
-        <option selected="selected" value="">Please select</option>
-    </select>
+
+<form asp-action="Filter" asp-controller="Products" method="get">
+    <input class ="form-control" type="text" asp-for="Name" placeholder="Name" />
+    <select class="form-control" asp-for="Category" asp-items="@Model.Categories"></select>
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search">Search</i></button>
 </form>
+
 <table class="table">
     <thead>
         <tr>
@@ -34,7 +35,7 @@
         </tr>
     </thead>
     <tbody>
-@*@foreach (var item in Model) {
+@foreach (var item in Model.Products) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -46,7 +47,7 @@
                 @Html.DisplayFor(modelItem => item.Count)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.InventoryValue)
+                @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -54,6 +55,6 @@
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
-}*@
+}
     </tbody>
 </table>
