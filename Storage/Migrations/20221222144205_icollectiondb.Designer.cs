@@ -12,8 +12,8 @@ using Storage.Data;
 namespace Storage.Migrations
 {
     [DbContext(typeof(StorageContext))]
-    [Migration("20221222125309_catdb4")]
-    partial class catdb4
+    [Migration("20221222144205_icollectiondb")]
+    partial class icollectiondb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,9 @@ namespace Storage.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
@@ -75,10 +78,9 @@ namespace Storage.Migrations
                     b.Property<string>("Shelf")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("categoryDbId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("ProductViewModelId");
 
@@ -104,9 +106,22 @@ namespace Storage.Migrations
 
             modelBuilder.Entity("Storage.Models.Product", b =>
                 {
+                    b.HasOne("Storage.Models.CategoryDb", "CategoryDb")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Storage.Models.ProductViewModel", null)
                         .WithMany("Products")
                         .HasForeignKey("ProductViewModelId");
+
+                    b.Navigation("CategoryDb");
+                });
+
+            modelBuilder.Entity("Storage.Models.CategoryDb", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Storage.Models.ProductViewModel", b =>

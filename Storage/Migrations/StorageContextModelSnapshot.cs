@@ -69,9 +69,6 @@ namespace Storage.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductViewModelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Shelf")
                         .HasColumnType("nvarchar(max)");
 
@@ -79,44 +76,21 @@ namespace Storage.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("ProductViewModelId");
-
                     b.ToTable("Product");
-                });
-
-            modelBuilder.Entity("Storage.Models.ProductViewModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductViewModel");
                 });
 
             modelBuilder.Entity("Storage.Models.Product", b =>
                 {
                     b.HasOne("Storage.Models.CategoryDb", "CategoryDb")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Storage.Models.ProductViewModel", null)
-                        .WithMany("Products")
-                        .HasForeignKey("ProductViewModelId");
-
                     b.Navigation("CategoryDb");
                 });
 
-            modelBuilder.Entity("Storage.Models.ProductViewModel", b =>
+            modelBuilder.Entity("Storage.Models.CategoryDb", b =>
                 {
                     b.Navigation("Products");
                 });

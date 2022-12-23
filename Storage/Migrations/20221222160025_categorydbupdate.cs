@@ -5,7 +5,7 @@
 namespace Storage.Migrations
 {
     /// <inheritdoc />
-    public partial class sdf : Migration
+    public partial class categorydbupdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

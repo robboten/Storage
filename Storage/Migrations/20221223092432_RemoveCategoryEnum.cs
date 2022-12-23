@@ -5,7 +5,7 @@
 namespace Storage.Migrations
 {
     /// <inheritdoc />
-    public partial class catdb5 : Migration
+    public partial class RemoveCategoryEnum : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

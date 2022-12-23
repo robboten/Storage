@@ -10,7 +10,7 @@ builder.Services.AddDbContext<StorageContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<ICategorySelectListService, CategorySelectListService>();
+builder.Services.AddScoped<ICategorySelectListService, CategoryDbSelectListService>();
 
 var app = builder.Build();
 

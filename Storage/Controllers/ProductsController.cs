@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Storage.Data;
 using Storage.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Storage.Controllers
 {
@@ -14,46 +15,78 @@ namespace Storage.Controllers
         {
             _context = context;
         }
-        
+
         public async Task<IActionResult> Search(ProductViewModel view)
         {
-            var products = string.IsNullOrWhiteSpace(view.Name) ? _context.Product : 
-                _context.Product.Where(p=>p.Name.Contains(view.Name));
-            products = view.Category is null ? products : products.Where(p => p.Category == view.Category);
+            IQueryable<Product> query = _context.Product.Include(p => p.CategoryDb);
+            //var query2 = _context.Product.Select(p => new
+            //{
+            //    SomeProp = p.CategoryDb.Name
+            //});
+
+            if (!string.IsNullOrWhiteSpace(view.Name))
+            {
+                query = query.Where(p => p.Name.Contains(view.Name));
+            }
+
+            if (view.CategoryId != null)
+            {
+                query = query.Where(p => p.CategoryId == view.CategoryId);
+            }
+            var products = await query.ToListAsync();
+
+            //var query = string.IsNullOrWhiteSpace(view.Name) ?
+            //    _context.Product.Include(c => c.CategoryDb) :
+            //    _context.Product.Include(c => c.CategoryDb).Where(p => p.Name.Contains(view.Name));
+
+            //query = view.CategoryId is null ?
+            //    query :
+            //    query.Where(p => p.CategoryId == view.CategoryId);
+
+            //var products = await query.ToListAsync();
 
             //get all categories, not just those in filtered view
-            var categories = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
+            //from database
+            var categoriesDb = await _context.Product.Include(c => c.CategoryDb).Select(p => p.CategoryDb).Distinct().ToListAsync();
 
-            ProductViewModel newView = new()
+            ProductViewModel productViewModel = new()
             {
-                Products= products,
-                Categories = categories.Select(c=>new SelectListItem { Text=c.ToString() }).ToList(),
+                Products = products,
+                //Categories = categories.Select(c=>new SelectListItem { Text=c.ToString() }).ToList(),
+                CategoriesDb = categoriesDb
+                .Select(c => new SelectListItem { Text = c.Name.ToString(), Value = c.Id.ToString() })
+                .ToList(),
             };
-            return View(newView);
+            return View(productViewModel);
         }
 
         public async Task<IActionResult> Storage()
         {
-            var categories = await _context.Product.Select(p => p.Category).Distinct().ToListAsync();
+            var productViewModels = await _context.Product
+                .Include(c => c.CategoryDb)
+                .Select(p => new ProductViewModelAlt
+                {
+                    Name = p.Name,
+                    Price = p.Price,
+                    Count = p.Count,
+                    InventoryValue = p.Count * p.Price,
+                    //Category = p.Category,
+                    CategoryId = p.CategoryId,
+                    CategoryDb = p.CategoryDb
+                })
+                //.Distinct()
+                .ToListAsync();
 
-            var newView = await _context.Product.Select(p => new ProductViewModelAlt
-            {
-                Name = p.Name,
-                Price = p.Price,
-                Count = p.Count,
-                InventoryValue = p.Count * p.Price,
-                Category = p.Category,
-                CategoryId = p.CategoryId
-            }).ToListAsync();
-
-            return View(newView);
+            return View(productViewModels);
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
+            //
+            //.Select(s => s.OrderByDescending(x => x.Date).FirstOrDefault());
             return _context.Product != null ?
-                        View(await _context.Product.ToListAsync()) :
+                        View(await _context.Product.Include(c => c.CategoryDb).OrderByDescending(x => x.OrderDate).ToListAsync()) :
                         Problem("Entity set 'StorageContext.Product'  is null.");
         }
 
@@ -66,7 +99,7 @@ namespace Storage.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
+            var product = await _context.Product.Include(c => c.CategoryDb)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -87,7 +120,7 @@ namespace Storage.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,OrderDate,Category,Shelf,Count,Description")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Name,Price,OrderDate,Category,Shelf,Count,Description,CategoryId,CategoryDb")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -119,7 +152,7 @@ namespace Storage.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,OrderDate,Category,Shelf,Count,Description")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,OrderDate,Category,Shelf,Count,Description,CategoryId,CategoryDb")] Product product)
         {
             if (id != product.Id)
             {
@@ -157,7 +190,7 @@ namespace Storage.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
+            var product = await _context.Product.Include(c => c.CategoryDb)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {

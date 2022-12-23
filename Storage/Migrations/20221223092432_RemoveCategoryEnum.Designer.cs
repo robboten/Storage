@@ -12,8 +12,8 @@ using Storage.Data;
 namespace Storage.Migrations
 {
     [DbContext(typeof(StorageContext))]
-    [Migration("20221221164925_nextcat")]
-    partial class nextcat
+    [Migration("20221223092432_RemoveCategoryEnum")]
+    partial class RemoveCategoryEnum
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,23 @@ namespace Storage.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Storage.Models.CategoryDb", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CategoryDb");
+                });
+
             modelBuilder.Entity("Storage.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -34,6 +51,9 @@ namespace Storage.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<int>("Count")
@@ -52,53 +72,28 @@ namespace Storage.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductViewModelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Shelf")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductViewModelId");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("Storage.Models.ProductViewModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InventoryValue")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductViewModel");
-                });
-
             modelBuilder.Entity("Storage.Models.Product", b =>
                 {
-                    b.HasOne("Storage.Models.ProductViewModel", null)
+                    b.HasOne("Storage.Models.CategoryDb", "CategoryDb")
                         .WithMany("Products")
-                        .HasForeignKey("ProductViewModelId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CategoryDb");
                 });
 
-            modelBuilder.Entity("Storage.Models.ProductViewModel", b =>
+            modelBuilder.Entity("Storage.Models.CategoryDb", b =>
                 {
                     b.Navigation("Products");
                 });

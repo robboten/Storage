@@ -12,8 +12,8 @@ using Storage.Data;
 namespace Storage.Migrations
 {
     [DbContext(typeof(StorageContext))]
-    [Migration("20221222141438_catdb8")]
-    partial class catdb8
+    [Migration("20221222161955_productviewcatid")]
+    partial class productviewcatid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,6 +95,9 @@ namespace Storage.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -107,7 +110,7 @@ namespace Storage.Migrations
             modelBuilder.Entity("Storage.Models.Product", b =>
                 {
                     b.HasOne("Storage.Models.CategoryDb", "CategoryDb")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -117,6 +120,11 @@ namespace Storage.Migrations
                         .HasForeignKey("ProductViewModelId");
 
                     b.Navigation("CategoryDb");
+                });
+
+            modelBuilder.Entity("Storage.Models.CategoryDb", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Storage.Models.ProductViewModel", b =>

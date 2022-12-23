@@ -14,16 +14,18 @@ namespace Storage.Models
         [Range(0, 10000, ErrorMessage = "Price should be between 0 and 10000"), DataType(DataType.Currency)]
         public int Price { get; set; }
         [DataType(DataType.Date)]
+        [Display(Name = "Order Date")]
         public DateTime? OrderDate { get; set; }
         public string? Shelf { get; set; }
         [Required]
         public int Count { get; set; }
         public string? Description { get; set; }
-        [Required]
         public Category Category { get; set; }
 
+        [Display(Name = "Category Id")]
         public int CategoryId { get; set; }
+
         [ForeignKey("CategoryId")]
-        public CategoryDb? CategoryDb { get; set; }
+        public CategoryDb CategoryDb { get; set; }
     }
 }

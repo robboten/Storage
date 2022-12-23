@@ -5,7 +5,7 @@
 namespace Storage.Migrations
 {
     /// <inheritdoc />
-    public partial class ProductAnnotations7 : Migration
+    public partial class icollectiondb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
