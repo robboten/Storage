@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Storage.Models
 {
@@ -20,12 +21,13 @@ namespace Storage.Models
         [Required]
         public int Count { get; set; }
         public string? Description { get; set; }
-        public Category Category { get; set; }
+        //public Category Category { get; set; }
 
         [Display(Name = "Category Id")]
+
         public int CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
-        public CategoryDb CategoryDb { get; set; }
+        public CategoryDb? CategoryDb { get; set; }
     }
 }

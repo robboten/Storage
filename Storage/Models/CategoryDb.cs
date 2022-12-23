@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Storage.Models
 {
@@ -8,6 +9,7 @@ namespace Storage.Models
         public int Id { get; set; }
         [Display(Name = "Category")]
         public string Name { get; set; } = string.Empty;
-        public ICollection<Product> Products { get; set; }
+        [JsonIgnore]
+        public ICollection<Product>? Products { get; set; }
     }
 }
